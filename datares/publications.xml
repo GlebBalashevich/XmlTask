@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<publications xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns="http://www.example.com/publications"
+              xsi:schemaLocation="http://www.example.com/publications publications.xsd">
+
+    <newspaper title="New York Times" issn-code="D3284271921">
+        <page>20</page>
+        <periodicity>daily</periodicity>
+        <publisher>
+            <country>Usa</country>
+            <license-expiration>2021-01-01</license-expiration>
+        </publisher>
+        <colored>false</colored>
+        <print-format>A2</print-format>
+    </newspaper>
+
+    <magazine title="Esquire" issn-code="E7509997004">
+        <page>60</page>
+        <periodicity>monthly</periodicity>
+        <publisher>
+            <country>Usa</country>
+            <license-expiration>2023-12-31</license-expiration>
+        </publisher>
+        <glossy>true</glossy>
+        <thematic>social</thematic>
+    </magazine>
+    
+    <newspaper title="Комсомольская правда">
+        <page>15</page>
+        <periodicity>daily</periodicity>
+        <publisher>
+            <country>Russia</country>
+            <license-expiration>2020-09-08</license-expiration>
+        </publisher>
+        <colored>false</colored>
+        <print-format>A3</print-format>
+    </newspaper>
+    
+    <magazine title="National Geographic" issn-code="N4606895000">
+        <page>179</page>
+        <periodicity>monthly</periodicity>
+        <publisher>
+            <country>Usa</country>
+            <license-expiration>2026-10-03</license-expiration>
+        </publisher>
+        <glossy>true</glossy>
+        <thematic>science</thematic>
+    </magazine>
+</publications>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.example.com/publications" xmlns:tns="http://www.example.com/publications"
+        elementFormDefault="qualified">
+
+    <element name="publication" type="tns:PublicationType" abstract="true"/>
+    <element name="magazine" type="tns:MagazineType" substitutionGroup="tns:publication"/>
+    <element name="newspaper" type="tns:NewsPaperType" substitutionGroup="tns:publication"/>
+
+    <element name="publications">
+    <complexType>
+        <sequence>
+            <element ref="tns:publication" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    </element>
+
+    <complexType name="PublicationType">
+        <sequence>
+            <element name="page" type="tns:Page"/>
+            <element name="periodicity" type="tns:Periodicity" default="daily"/>
+            <element name="publisher" type="tns:Publisher"/>
+        </sequence>
+        <attribute name="issn-code" type="tns:IssnCode" use="optional" default="A1111111111"/>
+        <attribute name="title" use="required">
+            <simpleType>
+                <restriction base="string">
+                    <pattern value="[a-zA-Z 0-9а-яА-Я]{1,100}"/>
+                </restriction>
+            </simpleType>
+        </attribute>
+    </complexType>
+
+    <complexType name="MagazineType">
+        <complexContent>
+            <extension base="tns:PublicationType">
+                <sequence>
+                    <element name="glossy" type="boolean"/>
+                    <element name="thematic" type="tns:Thematic" default="social"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="NewsPaperType">
+        <complexContent>
+            <extension base="tns:PublicationType">
+                <sequence>
+                    <element name="colored" type="boolean"/>
+                    <element name="print-format" type="tns:Format" default="A2"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <simpleType name="Page">
+        <restriction base="positiveInteger">
+            <minInclusive value="1"/>
+            <maxInclusive value="1000"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Thematic">
+        <restriction base="string">
+            <enumeration value="social"/>
+            <enumeration value="science"/>
+            <enumeration value="religious"/>
+            <enumeration value="childish"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Periodicity">
+        <restriction base="string">
+            <enumeration value="daily"/>
+            <enumeration value="weekly"/>
+            <enumeration value="monthly"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Format">
+        <restriction base="string">
+            <enumeration value="A2"/>
+            <enumeration value="A3"/>
+            <enumeration value="A4"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="IssnCode">
+        <restriction base="ID">
+            <pattern value="[A-Z0-9]{11}"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Publisher">
+        <sequence>
+            <element name="country" type="tns:Country" default="Russia"/>
+            <element name="license-expiration" type="date"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="Country">
+        <restriction base="string">
+            <enumeration value="Usa"/>
+            <enumeration value="Russia"/>
+            <enumeration value="England"/>
+            <enumeration value="Belarus"/>
+        </restriction>
+    </simpleType>
+</schema>
