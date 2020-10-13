@@ -23,6 +23,7 @@ import static by.balashevich.periodicals.builder.TagName.*;
 
 public class PublicationDomBuilder extends AbstractBuilder {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String EMPTY_VALUE = "";
     private DocumentBuilder docBuilder;
 
     public PublicationDomBuilder() throws PublicationProjectException {
@@ -61,7 +62,11 @@ public class PublicationDomBuilder extends AbstractBuilder {
             publication = buildMagazine(publicationElement);
         }
         publication.setTitle(publicationElement.getAttribute(TITLE.getTag()));
-        publication.setIssnCode(publicationElement.getAttribute(ISSN_CODE.getTag()));
+        if (publicationElement.getAttribute(ISSN_CODE.getTag()) != null) {
+            publication.setIssnCode(publicationElement.getAttribute(ISSN_CODE.getTag()));
+        } else{
+            publication.setIssnCode(EMPTY_VALUE);
+        }
         publication.setPage(Integer.parseInt(getElementByTagName(publicationElement, PAGE.getTag())));
         String periodicity = getElementByTagName(publicationElement, PERIODICITY.getTag()).toUpperCase();
         publication.setPeriodicity(Publication.Periodicity.valueOf(periodicity));
@@ -71,7 +76,7 @@ public class PublicationDomBuilder extends AbstractBuilder {
         return publication;
     }
 
-    private Newspaper buildNewspaper(Element newspaperElement) throws ParseException {
+    private Newspaper buildNewspaper(Element newspaperElement) {
         Newspaper newspaper = new Newspaper();
         newspaper.setColored(Boolean.parseBoolean(getElementByTagName(newspaperElement, COLORED.getTag())));
         String printFormat = getElementByTagName(newspaperElement, PRINT_FORMAT.getTag()).toUpperCase();
@@ -80,7 +85,7 @@ public class PublicationDomBuilder extends AbstractBuilder {
         return newspaper;
     }
 
-    private Magazine buildMagazine(Element magazineElement) throws ParseException {
+    private Magazine buildMagazine(Element magazineElement) {
         Magazine magazine = new Magazine();
         magazine.setGlossy(Boolean.parseBoolean(getElementByTagName(magazineElement, GLOSSY.getTag())));
         String thematic = getElementByTagName(magazineElement, THEMATIC.getTag()).toUpperCase();

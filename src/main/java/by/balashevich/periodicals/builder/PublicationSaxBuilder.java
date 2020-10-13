@@ -25,7 +25,7 @@ public class PublicationSaxBuilder extends AbstractBuilder{
             saxParser.parse(filename);
             publicationSet = publicationHandler.getPublicationSet();
         } catch (SAXException | IOException e) {
-            e.printStackTrace();
+            throw new PublicationProjectException("error while XML document built by SAX builder", e);
         }
     }
 

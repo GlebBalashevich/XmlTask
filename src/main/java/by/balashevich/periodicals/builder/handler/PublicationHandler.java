@@ -5,6 +5,9 @@ import by.balashevich.periodicals.entity.Magazine;
 import by.balashevich.periodicals.entity.Newspaper;
 import by.balashevich.periodicals.entity.Publication;
 import by.balashevich.periodicals.entity.Publisher;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -17,8 +20,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PublicationHandler extends DefaultHandler {
+    private static final Logger logger = LogManager.getLogger();
     private static final String DASH = "\\p{Pd}";
     private static final String UNDERSCORES = "_";
+    private static final String EMPTY_VALUE = "";
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private Set<Publication> publicationSet;
     private EnumSet<TagName> valuesTags;
@@ -27,7 +32,7 @@ public class PublicationHandler extends DefaultHandler {
 
     public PublicationHandler() {
         publicationSet = new HashSet<>();
-        valuesTags = EnumSet.range(TagName.TITLE, TagName.THEMATIC);
+        valuesTags = EnumSet.range(TagName.PAGE, TagName.THEMATIC);
     }
 
     public Set<Publication> getPublicationSet() {
@@ -48,7 +53,11 @@ public class PublicationHandler extends DefaultHandler {
                     publication.setTitle(attributes.getValue(i));
                 }
                 if (attributes.getLocalName(i).equals(TagName.ISSN_CODE.getTag())) {
-                    publication.setIssnCode(attributes.getValue(i));
+                    if (attributes.getValue(i) != null) {
+                        publication.setIssnCode(attributes.getValue(i));
+                    } else {
+                        publication.setIssnCode(EMPTY_VALUE);
+                    }
                 }
             }
         } else {
@@ -72,12 +81,6 @@ public class PublicationHandler extends DefaultHandler {
         String elementValue = new String(ch, start, length).trim();
         if (currentTag != null) {
             switch (currentTag) {
-                case TITLE:
-                    publication.setTitle(elementValue);
-                    break;
-                case ISSN_CODE:
-                    publication.setIssnCode(elementValue);
-                    break;
                 case PAGE:
                     publication.setPage(Integer.parseInt(elementValue));
                     break;
@@ -94,7 +97,8 @@ public class PublicationHandler extends DefaultHandler {
                         Date licenseExpiration = dateFormat.parse(elementValue);
                         publication.getPublisher().setLicenseExpiration(licenseExpiration);
                     } catch (ParseException e) {
-                        e.printStackTrace(); //todo add log
+                        logger.log(Level.WARN, "incorrect data value for License expiration, set current date", e);
+                        publication.getPublisher().setLicenseExpiration(new Date());
                     }
                     break;
                 case COLORED:

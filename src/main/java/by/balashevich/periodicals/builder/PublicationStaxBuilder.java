@@ -5,6 +5,7 @@ import by.balashevich.periodicals.entity.Newspaper;
 import by.balashevich.periodicals.entity.Publication;
 import by.balashevich.periodicals.entity.Publisher;
 import by.balashevich.periodicals.exception.PublicationProjectException;
+import org.apache.logging.log4j.Level;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -20,6 +21,7 @@ import java.util.Date;
 public class PublicationStaxBuilder extends AbstractBuilder {
     private static final String DASH = "\\p{Pd}";
     private static final String UNDERSCORES = "_";
+    private static final String EMPTY_VALUE = "";
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private XMLInputFactory inputFactory;
 
@@ -44,13 +46,13 @@ public class PublicationStaxBuilder extends AbstractBuilder {
                 }
             }
         } catch (FileNotFoundException | XMLStreamException e) {
-            e.printStackTrace();
+            throw new PublicationProjectException("error while building xml by Stax builder", e);
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.log(Level.WARN, "error while closing input stream in Stax builder", e);
                 }
             }
         }
@@ -58,17 +60,19 @@ public class PublicationStaxBuilder extends AbstractBuilder {
 
     private Publication buildPublication(XMLStreamReader xmlReader) throws XMLStreamException {
         Publication publication = null;
-
         if (xmlReader.getLocalName().equals(TagName.MAGAZINE.getTag())) {
             publication = new Magazine();
         }
         if (xmlReader.getLocalName().equals(TagName.NEWSPAPER.getTag())) {
             publication = new Newspaper();
         }
-
         if (publication != null) {
             publication.setTitle(xmlReader.getAttributeValue(null, TagName.TITLE.getTag()));
-            publication.setIssnCode(xmlReader.getAttributeValue(null, TagName.ISSN_CODE.getTag()));
+            if (xmlReader.getAttributeValue(null, TagName.ISSN_CODE.getTag()) != null) {
+                publication.setIssnCode(xmlReader.getAttributeValue(null, TagName.ISSN_CODE.getTag()));
+            } else {
+                publication.setIssnCode(EMPTY_VALUE);
+            }
 
             while (xmlReader.hasNext()) {
                 int type = xmlReader.next();
@@ -130,7 +134,8 @@ public class PublicationStaxBuilder extends AbstractBuilder {
                             Date licenseExpiration = dateFormat.parse(xmlReader.getElementText());
                             publisher.setLicenseExpiration(licenseExpiration);
                         } catch (ParseException e) {
-                            e.printStackTrace(); //todo add log
+                            logger.log(Level.WARN, "incorrect data value for License expiration, set current date", e);
+                            publisher.setLicenseExpiration(new Date());
                         }
                         break;
                 }
